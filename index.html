@@ -26,28 +26,25 @@ header{padding:23px 3px 17px;display:flex;justify-content:space-between;align-it
 .modal{position:fixed;inset:0;background:#17152e75;display:none;align-items:flex-end;justify-content:center;padding:10px;z-index:5}.modal.show{display:flex}.sheet{width:100%;max-width:620px;max-height:94vh;overflow:auto;background:white;border-radius:24px;padding:20px 17px calc(18px + env(safe-area-inset-bottom))}.sheethead{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.sheethead h3{margin:0;font-size:20px}.close{border:0;background:#f1f1f8;border-radius:11px;width:35px;height:35px;font-size:20px}
 label{display:block;font-size:13px;color:var(--muted);margin:12px 0 6px}.field{width:100%;border:1px solid var(--line);background:#fbfbfe;border-radius:12px;padding:12px;color:var(--text);outline:none;min-height:44px}.field:focus{border-color:var(--primary)}.row{display:grid;grid-template-columns:1fr 1fr;gap:9px}.optionbox{display:flex;flex-wrap:wrap;gap:8px}.opt{display:flex;align-items:center;gap:7px;background:#f7f6ff;border:1px solid #e5e2ff;border-radius:11px;padding:9px 11px;font-size:12px;color:var(--text)}.opt input{accent-color:var(--primary)}.save{width:100%;border:0;border-radius:13px;padding:14px;background:var(--primary);color:white;font-weight:750;margin-top:18px}.hint{font-size:12px;line-height:1.7;color:#66627f;background:#f3f1ff;padding:10px 12px;border-radius:12px;margin-top:12px}.toast{position:fixed;top:calc(12px + env(safe-area-inset-top));left:50%;transform:translate(-50%,-15px);opacity:0;pointer-events:none;background:#25233d;color:white;padding:12px 15px;border-radius:12px;z-index:10;transition:.2s;max-width:90%;font-size:13px}.toast.show{opacity:1;transform:translate(-50%,0)}.footer{text-align:center;color:var(--muted);font-size:11px;line-height:1.8;margin:25px 0 85px}
 @media(min-width:620px){.quickcats{grid-template-columns:repeat(3,minmax(0,1fr))}.modal{align-items:center}.sheet{border-radius:24px}.app{padding-top:12px}}
+[hidden]{display:none!important}.home-actions{display:flex;gap:8px;margin:16px 0}.primarynav{width:100%;border:0;border-radius:14px;padding:14px;background:var(--primary);color:white;font-weight:750}
 </style>
 </head>
 <body>
 <div class="app">
 <header>
  <div class="brand"><div class="logo">◷</div><div><h1>ذكّرني</h1><p>مواعيدك المهمة في مكان واحد</p></div></div>
- <div class="head-actions"><button class="iconbtn" id="notifyBtn" title="تفعيل الإشعارات">♧</button></div>
+ <div class="head-actions"><button class="iconbtn" id="manageBtn" title="الأقسام وإدارة المواعيد">☷</button><button class="iconbtn" id="notifyBtn" title="تفعيل الإشعارات">♧</button></div>
 </header>
 <section class="hero"><small id="todayLabel">مواعيد اليوم</small><h2>أهلاً بيك 👋</h2><p id="heroText">كل مهام يومك هتظهر هنا، علشان تتابعها بسهولة.</p></section>
 <div class="stats"><div class="stat"><strong id="todayCount">0</strong><span>مطلوب اليوم</span></div><div class="stat"><strong id="upcomingCount">0</strong><span>مواعيد قادمة</span></div><div class="stat"><strong id="doneCount">0</strong><span>تم إنجازه</span></div></div>
-<div class="sectionhead"><h3>الأقسام</h3><span class="muted">اختار القسم لإضافة موعد</span></div>
-<div class="quickcats">
-<button class="catbtn" data-cat="patients"><span class="caticon">🏥</span><span><strong>زيارة مرضى</strong><small>اسم المريض ومكان الزيارة</small></span></button>
-<button class="catbtn" data-cat="private"><span class="caticon">🤝</span><span><strong>زيارات خاصة</strong><small>نوع الزيارة والموعد</small></span></button>
-<button class="catbtn" data-cat="weddings"><span class="caticon">💍</span><span><strong>أكاليل</strong><small>الاسم والتاريخ والساعة والمكان</small></span></button>
-<button class="catbtn" data-cat="engagements"><span class="caticon">💐</span><span><strong>خطوبات</strong><small>الاسم والتاريخ والساعة والمكان</small></span></button>
-<button class="catbtn" data-cat="special"><span class="caticon">📌</span><span><strong>مواعيد خاصة</strong><small>التاريخ والساعة والمكان</small></span></button>
-<button class="catbtn" data-cat="all"><span class="caticon">🗓️</span><span><strong>كل المواعيد</strong><small>عرض وإدارة كل المهام</small></span></button>
-</div>
+<div class="sectionhead"><h3>مواعيد اليوم فقط</h3><span class="muted" id="todayListCount"></span></div>
+<div class="list" id="todayList" style="margin-top:12px"></div>
+<div class="home-actions"><button class="primarynav" id="openManage">＋ الأقسام وإضافة المواعيد</button></div>
+<section id="managePage" hidden><button class="tab" id="backHome">← الرجوع لمواعيد اليوم</button>
 <div class="sectionhead"><h3 id="listHeading">كل مهامك</h3><span class="muted" id="listCount"></span></div>
 <div class="tabs" id="tabs"><button class="tab active" data-filter="today">اليوم</button><button class="tab" data-filter="all">الكل</button><button class="tab" data-filter="upcoming">القادمة</button><button class="tab" data-filter="done">المكتملة</button><button class="tab" data-filter="late">المتأخرة</button></div>
 <div class="list" id="taskList" style="margin-top:12px"></div>
+</section>
 <div class="footer">المواعيد محفوظة على هذا الجهاز.<br>هذه النسخة تحفظ بياناتك محليًا. إرسال إشعارات أثناء إغلاق الموقع يحتاج إعداد Web Push إضافيًا.</div>
 </div>
 <button class="fab" id="addBtn">＋ إضافة موعد</button>
@@ -187,7 +184,21 @@ function checkNotifications(){
   }
  });
 }
+
+function renderToday(){
+ const td=today(), now=new Date(); const arr=sorted(tasks.filter(t=>t.date===td));
+ $('todayListCount').textContent=arr.length+' موعد';
+ const list=$('todayList');
+ if(!arr.length){list.innerHTML='<div class="empty"><strong>مفيش مواعيد مسجلة لليوم 🎉</strong>افتح الأقسام لإضافة موعد جديد.</div>';return;}
+ list.innerHTML=arr.map(t=>{let meta=[`${categories[t.category]?.icon||'◷'} ${categories[t.category]?.label||'موعد'}`,`⏰ ${escapeHtml(t.time||'بدون ساعة')}`];if(t.done)meta.push('تم');return `<article class="task ${t.done?'done':''}"><button class="check" data-home-act="toggle" data-id="${t.id}">${t.done?'✓':''}</button><div class="taskbody"><div class="tasktitle">${escapeHtml(taskName(t))}</div>${taskDesc(t)?`<div class="taskdesc">${escapeHtml(taskDesc(t))}</div>`:''}<div class="meta">${meta.map(m=>`<span class="pill">${m}</span>`).join('')}</div></div><div class="actions"><button class="mini" data-home-act="edit" data-id="${t.id}">✎</button></div></article>`}).join('');
+}
+function showManage(){ $('managePage').hidden=false; document.querySelector('.hero').hidden=true;document.querySelector('.stats').hidden=true;document.querySelectorAll('.app > .sectionhead,.app > .list,.home-actions,.app > .footer').forEach(el=>el.hidden=true);$('manageBtn').hidden=true;$('addBtn').hidden=false;render();}
+function showHome(){ $('managePage').hidden=true;document.querySelector('.hero').hidden=false;document.querySelector('.stats').hidden=false;document.querySelectorAll('.app > .sectionhead,.app > .list,.home-actions,.app > .footer').forEach(el=>el.hidden=false);$('manageBtn').hidden=false;render();renderToday();}
+$('manageBtn').onclick=showManage;$('openManage').onclick=showManage;$('backHome').onclick=showHome;
+$('todayList').onclick=e=>{let b=e.target.closest('[data-home-act]');if(!b)return;let t=tasks.find(x=>x.id===b.dataset.id);if(!t)return;if(b.dataset.homeAct==='toggle'){t.done=!t.done;persist();render();renderToday()}else{showManage();openForm(t.category,t)}};
+const originalRender=render;render=function(){originalRender();if($('todayList'))renderToday();};
+
 if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
-render();checkNotifications();setInterval(()=>{checkNotifications();render()},15000);
+render();renderToday();showHome();checkNotifications();setInterval(()=>{checkNotifications();render();renderToday()},15000);
 </script>
 </body></html>
