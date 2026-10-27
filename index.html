@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#6558e8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="ذكّرني">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>ذكّرني | تنظيم مواعيدك</title>
+<style>
+:root{--bg:#f5f6fb;--card:#fff;--text:#202238;--muted:#73758b;--primary:#6558e8;--line:#e8e9f2;--green:#168765;--red:#cf405b;--shadow:0 12px 30px #29245c0d}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,Arial,sans-serif}button,input,select{font:inherit}button{cursor:pointer}
+.app{max-width:820px;margin:auto;padding:env(safe-area-inset-top) 15px calc(30px + env(safe-area-inset-bottom))}
+header{padding:23px 3px 17px;display:flex;justify-content:space-between;align-items:center;gap:12px}.brand{display:flex;align-items:center;gap:11px}.logo{width:47px;height:47px;border-radius:16px;background:linear-gradient(135deg,#5e52db,#a098ff);color:white;display:grid;place-items:center;font-size:25px}.brand h1{margin:0;font-size:25px}.brand p{margin:3px 0 0;color:var(--muted);font-size:12px}.head-actions{display:flex;gap:7px}.iconbtn{border:1px solid var(--line);background:white;border-radius:13px;width:42px;height:42px;font-size:18px;color:var(--text)}
+.hero{background:linear-gradient(130deg,#5d51dd,#8c80f5);color:white;padding:22px;border-radius:24px;box-shadow:var(--shadow)}.hero small{opacity:.85}.hero h2{font-size:26px;margin:8px 0 5px}.hero p{margin:0;line-height:1.7;font-size:14px;opacity:.94}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:13px 0 21px}.stat{background:white;border:1px solid var(--line);border-radius:16px;text-align:center;padding:12px 5px}.stat strong{font-size:22px;display:block}.stat span{font-size:11px;color:var(--muted)}
+.sectionhead{display:flex;align-items:center;justify-content:space-between;margin:22px 2px 12px}.sectionhead h3{margin:0;font-size:18px}.muted{font-size:12px;color:var(--muted)}
+.quickcats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.catbtn{border:1px solid var(--line);background:white;border-radius:18px;padding:15px 13px;text-align:right;display:flex;gap:11px;align-items:center;min-height:83px;color:var(--text);box-shadow:0 3px 12px #25225504}.caticon{width:43px;height:43px;display:grid;place-items:center;border-radius:14px;background:#f0eeff;font-size:23px;flex-shrink:0}.catbtn strong{display:block;font-size:14px}.catbtn small{display:block;color:var(--muted);font-size:11px;margin-top:4px}
+.tabs{display:flex;gap:7px;overflow:auto;padding-bottom:3px}.tab{white-space:nowrap;border:1px solid var(--line);background:white;color:var(--muted);padding:9px 13px;border-radius:12px}.tab.active{background:#eeecff;color:var(--primary);border-color:#d7d2ff;font-weight:700}
+.list{display:grid;gap:9px}.task{display:flex;align-items:flex-start;gap:10px;background:white;border:1px solid var(--line);border-radius:17px;padding:13px;box-shadow:0 3px 12px #25225504}.check{width:24px;height:24px;flex:0 0 24px;border:2px solid #d4d5e3;border-radius:8px;background:white;margin-top:2px;color:white}.task.done .check{background:var(--green);border-color:var(--green)}.taskbody{min-width:0;flex:1}.tasktitle{font-weight:750;font-size:15px;overflow-wrap:anywhere}.task.done .tasktitle{text-decoration:line-through;color:var(--muted)}.taskdesc{font-size:12px;color:var(--muted);line-height:1.7;margin-top:4px}.meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}.pill{font-size:11px;padding:4px 7px;border-radius:8px;background:#f1f1f8;color:#64657a}.pill.today{background:#fff0d8;color:#8b5b00}.pill.late{background:#ffedf0;color:var(--red)}.actions{display:flex;gap:5px}.mini{border:0;background:transparent;color:#898aa1;font-size:17px;padding:2px 4px}
+.empty{padding:26px 16px;text-align:center;background:white;border:1px dashed #d7d8e8;border-radius:17px;color:var(--muted);line-height:1.8}.empty strong{display:block;color:var(--text)}
+.fab{position:fixed;bottom:calc(20px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);border:0;background:var(--primary);color:white;padding:14px 22px;border-radius:17px;font-weight:750;white-space:nowrap;box-shadow:0 10px 25px #6558e855;z-index:2}
+.modal{position:fixed;inset:0;background:#17152e75;display:none;align-items:flex-end;justify-content:center;padding:10px;z-index:5}.modal.show{display:flex}.sheet{width:100%;max-width:620px;max-height:94vh;overflow:auto;background:white;border-radius:24px;padding:20px 17px calc(18px + env(safe-area-inset-bottom))}.sheethead{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.sheethead h3{margin:0;font-size:20px}.close{border:0;background:#f1f1f8;border-radius:11px;width:35px;height:35px;font-size:20px}
+label{display:block;font-size:13px;color:var(--muted);margin:12px 0 6px}.field{width:100%;border:1px solid var(--line);background:#fbfbfe;border-radius:12px;padding:12px;color:var(--text);outline:none;min-height:44px}.field:focus{border-color:var(--primary)}.row{display:grid;grid-template-columns:1fr 1fr;gap:9px}.optionbox{display:flex;flex-wrap:wrap;gap:8px}.opt{display:flex;align-items:center;gap:7px;background:#f7f6ff;border:1px solid #e5e2ff;border-radius:11px;padding:9px 11px;font-size:12px;color:var(--text)}.opt input{accent-color:var(--primary)}.save{width:100%;border:0;border-radius:13px;padding:14px;background:var(--primary);color:white;font-weight:750;margin-top:18px}.hint{font-size:12px;line-height:1.7;color:#66627f;background:#f3f1ff;padding:10px 12px;border-radius:12px;margin-top:12px}.toast{position:fixed;top:calc(12px + env(safe-area-inset-top));left:50%;transform:translate(-50%,-15px);opacity:0;pointer-events:none;background:#25233d;color:white;padding:12px 15px;border-radius:12px;z-index:10;transition:.2s;max-width:90%;font-size:13px}.toast.show{opacity:1;transform:translate(-50%,0)}.footer{text-align:center;color:var(--muted);font-size:11px;line-height:1.8;margin:25px 0 85px}
+@media(min-width:620px){.quickcats{grid-template-columns:repeat(3,minmax(0,1fr))}.modal{align-items:center}.sheet{border-radius:24px}.app{padding-top:12px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+ <div class="brand"><div class="logo">◷</div><div><h1>ذكّرني</h1><p>مواعيدك المهمة في مكان واحد</p></div></div>
+ <div class="head-actions"><button class="iconbtn" id="notifyBtn" title="تفعيل الإشعارات">♧</button></div>
+</header>
+<section class="hero"><small id="todayLabel">مواعيد اليوم</small><h2>أهلاً بيك 👋</h2><p id="heroText">كل مهام يومك هتظهر هنا، علشان تتابعها بسهولة.</p></section>
+<div class="stats"><div class="stat"><strong id="todayCount">0</strong><span>مطلوب اليوم</span></div><div class="stat"><strong id="upcomingCount">0</strong><span>مواعيد قادمة</span></div><div class="stat"><strong id="doneCount">0</strong><span>تم إنجازه</span></div></div>
+<div class="sectionhead"><h3>الأقسام</h3><span class="muted">اختار القسم لإضافة موعد</span></div>
+<div class="quickcats">
+<button class="catbtn" data-cat="patients"><span class="caticon">🏥</span><span><strong>زيارة مرضى</strong><small>اسم المريض ومكان الزيارة</small></span></button>
+<button class="catbtn" data-cat="private"><span class="caticon">🤝</span><span><strong>زيارات خاصة</strong><small>نوع الزيارة والموعد</small></span></button>
+<button class="catbtn" data-cat="weddings"><span class="caticon">💍</span><span><strong>أكاليل</strong><small>الاسم والتاريخ والساعة والمكان</small></span></button>
+<button class="catbtn" data-cat="engagements"><span class="caticon">💐</span><span><strong>خطوبات</strong><small>الاسم والتاريخ والساعة والمكان</small></span></button>
+<button class="catbtn" data-cat="special"><span class="caticon">📌</span><span><strong>مواعيد خاصة</strong><small>التاريخ والساعة والمكان</small></span></button>
+<button class="catbtn" data-cat="all"><span class="caticon">🗓️</span><span><strong>كل المواعيد</strong><small>عرض وإدارة كل المهام</small></span></button>
+</div>
+<div class="sectionhead"><h3 id="listHeading">كل مهامك</h3><span class="muted" id="listCount"></span></div>
+<div class="tabs" id="tabs"><button class="tab active" data-filter="today">اليوم</button><button class="tab" data-filter="all">الكل</button><button class="tab" data-filter="upcoming">القادمة</button><button class="tab" data-filter="done">المكتملة</button><button class="tab" data-filter="late">المتأخرة</button></div>
+<div class="list" id="taskList" style="margin-top:12px"></div>
+<div class="footer">المواعيد محفوظة على هذا الجهاز.<br>هذه النسخة تحفظ بياناتك محليًا. إرسال إشعارات أثناء إغلاق الموقع يحتاج إعداد Web Push إضافيًا.</div>
+</div>
+<button class="fab" id="addBtn">＋ إضافة موعد</button>
+
+<div class="modal" id="modal"><form class="sheet" id="taskForm">
+<div class="sheethead"><h3 id="formTitle">إضافة موعد</h3><button class="close" type="button" id="closeBtn">×</button></div>
+<label for="category">القسم</label><select class="field" id="category" required>
+<option value="patients">زيارة مرضى</option><option value="private">زيارات خاصة</option><option value="weddings">أكاليل</option><option value="engagements">خطوبات</option><option value="special">مواعيد خاصة</option>
+</select>
+<div id="dynamicFields"></div>
+<div class="row"><div><label for="date">التاريخ</label><input class="field" id="date" type="date" required></div><div><label for="time">الساعة</label><input class="field" id="time" type="time" required></div></div>
+<div class="row"><div><label for="lead">التنبيه قبل الموعد</label><select class="field" id="lead"><option value="0">في نفس الموعد</option><option value="5">قبلها بـ 5 دقائق</option><option value="10">قبلها بـ 10 دقائق</option><option value="30" selected>قبلها بـ 30 دقيقة</option><option value="60">قبلها بساعة</option><option value="1440">قبلها بيوم</option></select></div><div><label for="repeat">التكرار</label><select class="field" id="repeat"><option value="none">بدون تكرار</option><option value="daily">يومي</option><option value="weekly">أسبوعي</option><option value="monthly">شهري</option></select></div></div>
+<label class="opt" style="margin-top:13px"><input type="checkbox" id="notify" checked> فعّل التنبيه لهذا الموعد</label>
+<div class="hint">سيظهر موعدك في الصفحة الرئيسية في يومه. الإشعارات أثناء إغلاق الموقع بالكامل لا تعمل في هذه النسخة إلا بعد إعداد خدمة Web Push.</div>
+<button class="save" type="submit">حفظ الموعد</button>
+</form></div>
+<div class="toast" id="toast"></div>
+<script>
+const KEY='zakerni_tasks_v2', MORNING_KEY='zakerni_morning_v2';
+const categories={
+ patients:{label:'زيارة مرضى',icon:'🏥'},
+ private:{label:'زيارات خاصة',icon:'🤝'},
+ weddings:{label:'أكاليل',icon:'💍'},
+ engagements:{label:'خطوبات',icon:'💐'},
+ special:{label:'مواعيد خاصة',icon:'📌'}
+};
+let tasks=load(), filter='today', categoryView='all', editing=null, notified=new Set();
+function load(){try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch{return []}}
+function persist(){localStorage.setItem(KEY,JSON.stringify(tasks))}
+const $=id=>document.getElementById(id), pad=n=>String(n).padStart(2,'0');
+function today(){let d=new Date();return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`}
+function asDate(t){return new Date(`${t.date}T${t.time||'23:59'}:00`)}
+function fmtDate(s){return new Date(`${s}T12:00:00`).toLocaleDateString('ar-EG',{weekday:'long',day:'numeric',month:'long'})}
+function escapeHtml(s=''){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function taskName(t){let base=t.name||t.title||categories[t.category]?.label||'موعد';return t.category==='private'&&t.visitTypes?.length?`${base} — ${t.visitTypes.join('، ')}`:base}
+function taskPlace(t){if(t.category==='patients')return t.place==='home'?'البيت':'المستشفى';return t.place||''}
+function taskDesc(t){let bits=[];let p=taskPlace(t);if(p)bits.push('المكان: '+p);if(t.category==='private'&&t.visitTypes?.length)bits.push('النوع: '+t.visitTypes.join('، '));if(t.notes)bits.push(t.notes);return bits.join(' • ')}
+function sorted(a){return [...a].sort((x,y)=>asDate(x)-asDate(y))}
+function render(){
+ let now=new Date(), td=today(), active=tasks.filter(t=>!t.done);
+ let todays=active.filter(t=>t.date===td);
+ $('todayLabel').textContent=fmtDate(td);
+ $('todayCount').textContent=todays.length;
+ $('upcomingCount').textContent=active.filter(t=>asDate(t)>now).length;
+ $('doneCount').textContent=tasks.filter(t=>t.done).length;
+ $('heroText').textContent=todays.length?`عندك ${todays.length} ${todays.length===1?'موعد مطلوب':'مواعيد مطلوبة'} النهارده. راجع القائمة تحت.`:'مفيش مواعيد مسجلة لليوم. تقدر تضيف موعد من الأقسام فوق.';
+ let arr=sorted(tasks).filter(t=>{
+   if(categoryView!=='all'&&t.category!==categoryView)return false;
+   if(filter==='today')return t.date===td&&!t.done;
+   if(filter==='upcoming')return !t.done&&asDate(t)>now;
+   if(filter==='done')return t.done;
+   if(filter==='late')return !t.done&&asDate(t)<now;
+   return true;
+ });
+ $('listHeading').textContent=categoryView==='all'?'مهامك':categories[categoryView].label;
+ $('listCount').textContent=`${arr.length} موعد`;
+ let list=$('taskList');
+ if(!arr.length){list.innerHTML='<div class="empty"><strong>مفيش مواعيد هنا</strong>اضغط على أحد الأقسام فوق لإضافة موعد جديد.</div>';return}
+ list.innerHTML=arr.map(t=>{
+  let past=!t.done&&asDate(t)<now, todayFlag=t.date===td;
+  let meta=[`${categories[t.category]?.icon||'◷'} ${categories[t.category]?.label||'موعد'}`,`📅 ${fmtDate(t.date)}`,`⏰ ${escapeHtml(t.time||'بدون ساعة')}`];
+  if(past)meta.push('فات موعده');else if(todayFlag&&!t.done)meta.push('اليوم');
+  return `<article class="task ${t.done?'done':''}"><button class="check" data-act="toggle" data-id="${t.id}" aria-label="مكتمل">${t.done?'✓':''}</button><div class="taskbody"><div class="tasktitle">${escapeHtml(taskName(t))}</div>${taskDesc(t)?`<div class="taskdesc">${escapeHtml(taskDesc(t))}</div>`:''}<div class="meta">${meta.map(m=>`<span class="pill ${m==='اليوم'?'today':m==='فات موعده'?'late':''}">${m}</span>`).join('')}</div></div><div class="actions"><button class="mini" data-act="edit" data-id="${t.id}" aria-label="تعديل">✎</button><button class="mini" data-act="delete" data-id="${t.id}" aria-label="حذف">⌫</button></div></article>`;
+ }).join('');
+}
+function toast(msg){$('toast').textContent=msg;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2600)}
+function renderFields(cat, task={}){
+ let el=$('dynamicFields');
+ let nameLabel=cat==='patients'?'اسم المريض':cat==='private'?'الاسم':cat==='weddings'?'اسم العروسين':cat==='engagements'?'اسم المخطوبين':'اسم الموعد (اختياري)';
+ let html='';
+ if(cat!=='special')html+=`<label for="name">${nameLabel}</label><input class="field" id="name" maxlength="120" ${cat==='special'?'':'required'} placeholder="${nameLabel}">`;
+ if(cat==='patients')html+=`<label for="place">مكان الزيارة</label><select class="field" id="place" required><option value="home">البيت</option><option value="hospital">مستشفى</option></select>`;
+ if(cat==='private')html+=`<label>نوع الزيارة (اختياري، ممكن تختار أكتر من بند)</label><div class="optionbox"><label class="opt"><input type="checkbox" name="visitType" value="تبريك منازل"> تبريك منازل</label><label class="opt"><input type="checkbox" name="visitType" value="صلاة طشت"> صلاة طشت</label><label class="opt"><input type="checkbox" name="visitType" value="افتقاد شخصي"> افتقاد شخصي</label></div><label for="place">المكان (اختياري)</label><input class="field" id="place" placeholder="اكتب المكان">`;
+ if(cat==='weddings'||cat==='engagements'||cat==='special')html+=`<label for="place">المكان</label><input class="field" id="place" ${cat==='special'?'':'required'} placeholder="اكتب المكان">`;
+ if(cat==='patients'||cat==='private')html+=`<label for="notes">ملاحظات (اختياري)</label><input class="field" id="notes" maxlength="250" placeholder="تفاصيل إضافية">`;
+ el.innerHTML=html;
+ if($('name'))$('name').value=task.name||'';
+ if($('place'))$('place').value=task.place|| (cat==='patients'?'home':'');
+ if($('notes'))$('notes').value=task.notes||'';
+ if(task.visitTypes)document.querySelectorAll('input[name="visitType"]').forEach(x=>x.checked=task.visitTypes.includes(x.value));
+}
+function openForm(cat='patients',task=null){
+ editing=task?.id||null;$('taskForm').reset();
+ $('formTitle').textContent=task?'تعديل الموعد':'إضافة موعد';
+ $('category').value=task?.category||cat;
+ renderFields($('category').value,task||{});
+ $('date').value=task?.date||today();
+ let now=new Date();$('time').value=task?.time||`${pad(now.getHours())}:${pad(now.getMinutes())}`;
+ $('lead').value=String(task?.lead??30);$('repeat').value=task?.repeat||'none';$('notify').checked=task?.notify!==false;
+ $('modal').classList.add('show');
+}
+function closeForm(){$('modal').classList.remove('show');editing=null}
+document.querySelectorAll('[data-cat]').forEach(b=>b.onclick=()=>{let c=b.dataset.cat;if(c==='all'){categoryView='all';filter='all';syncTabs();render()}else openForm(c)});
+$('addBtn').onclick=()=>openForm(categoryView!=='all'?categoryView:'patients');
+$('closeBtn').onclick=closeForm;$('modal').addEventListener('click',e=>{if(e.target===$('modal'))closeForm()});
+$('category').onchange=()=>renderFields($('category').value,{});
+function syncTabs(){document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.filter===filter))}
+$('tabs').onclick=e=>{let b=e.target.closest('[data-filter]');if(!b)return;filter=b.dataset.filter;categoryView='all';syncTabs();render()};
+$('taskForm').onsubmit=e=>{
+ e.preventDefault();let cat=$('category').value;
+ let name=$('name')?.value.trim()||'';
+ let place=$('place')?.value.trim()||'';
+ if(cat==='patients'&&!name){toast('اكتب اسم المريض');return}
+ if(cat==='private'&&!name){toast('اكتب الاسم');return}
+ if((cat==='weddings'||cat==='engagements')&&!name){toast('اكتب الاسم');return}
+ if(cat==='special'&&!place){toast('اكتب المكان');return}
+ let visitTypes=[...document.querySelectorAll('input[name="visitType"]:checked')].map(x=>x.value);
+ let data={id:editing||crypto.randomUUID(),category:cat,name,place,notes:$('notes')?.value.trim()||'',visitTypes,date:$('date').value,time:$('time').value,lead:Number($('lead').value),repeat:$('repeat').value,notify:$('notify').checked,done:false,created:Date.now()};
+ if(editing){let old=tasks.find(t=>t.id===editing);data.done=old?.done||false;tasks=tasks.map(t=>t.id===editing?data:t)}else tasks.push(data);
+ persist();closeForm();categoryView='all';filter='today';syncTabs();render();toast('اتحفظ الموعد بنجاح ✓');checkNotifications();
+};
+$('taskList').onclick=e=>{let b=e.target.closest('[data-act]');if(!b)return;let t=tasks.find(x=>x.id===b.dataset.id);if(!t)return;
+ if(b.dataset.act==='toggle'){t.done=!t.done;persist();render()}
+ if(b.dataset.act==='edit')openForm(t.category,t);
+ if(b.dataset.act==='delete'&&confirm('متأكد إنك عايز تحذف الموعد؟')){tasks=tasks.filter(x=>x.id!==t.id);persist();render();toast('تم حذف الموعد')}
+};
+$('notifyBtn').onclick=async()=>{
+ if(!('Notification'in window)){toast('الإشعارات غير مدعومة في هذا المتصفح');return}
+ try{let p=await Notification.requestPermission();toast(p==='granted'?'تم السماح بالإشعارات ✓':'لم يتم السماح بالإشعارات')}
+ catch{toast('تعذر تفعيل الإشعارات')}
+};
+function sendNotice(title,body,tag){if(!('Notification'in window)||Notification.permission!=='granted')return;try{new Notification(title,{body,icon:'icon-192.png',tag})}catch{}}
+function checkNotifications(){
+ if(!('Notification'in window)||Notification.permission!=='granted')return;
+ let now=new Date(), todayKey=today(), morningKey=localStorage.getItem(MORNING_KEY);
+ // رسالة ملخص اليوم: تظهر مرة واحدة في أول فتح للتطبيق في كل يوم.
+ if(morningKey!==todayKey){
+  let todays=tasks.filter(t=>!t.done&&t.date===todayKey).sort((a,b)=>asDate(a)-asDate(b));
+  if(todays.length){let summary=todays.slice(0,6).map(t=>`${t.time} ${taskName(t)}`).join(' | ')+(todays.length>6?` | و${todays.length-6} مواعيد أخرى`:'');sendNotice('صباح الخير — مواعيد اليوم',summary,'zakerni-morning-'+todayKey)}
+  localStorage.setItem(MORNING_KEY,todayKey);
+ }
+ tasks.forEach(t=>{
+  if(t.done||!t.notify)return;
+  let due=asDate(t).getTime()-t.lead*60000, key=`${t.id}-${t.date}-${t.time}-${t.lead}`;
+  if(due<=now.getTime()&&asDate(t).getTime()>now.getTime()-60000&&!notified.has(key)){
+   sendNotice('ذكّرني: '+taskName(t),`${t.time} — ${taskDesc(t)||'ميعادك وصل'}`,'task-'+key);notified.add(key);
+  }
+ });
+}
+if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+render();checkNotifications();setInterval(()=>{checkNotifications();render()},15000);
+</script>
+</body></html>
