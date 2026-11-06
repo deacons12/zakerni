@@ -45,7 +45,7 @@ label{display:block;font-size:13px;color:var(--muted);margin:12px 0 6px}.field{w
 <div class="tabs" id="tabs"><button class="tab active" data-filter="today">اليوم</button><button class="tab" data-filter="all">الكل</button><button class="tab" data-filter="upcoming">القادمة</button><button class="tab" data-filter="done">المكتملة</button><button class="tab" data-filter="late">المتأخرة</button></div>
 <div class="list" id="taskList" style="margin-top:12px"></div>
 </section>
-<div class="footer">المواعيد محفوظة على هذا الجهاز.<br>هذه النسخة تحفظ بياناتك محليًا. إرسال إشعارات أثناء إغلاق الموقع يحتاج إعداد Web Push إضافيًا.</div>
+<div class="footer">المواعيد محفوظة على جهازك ومتزامنة مع السحابة عند اكتمال الإعداد.<br>فعّل الإشعارات من زر الجرس لتصلك التذكيرات والموقع مغلق.</div>
 </div>
 <button class="fab" id="addBtn">＋ إضافة موعد</button>
 
@@ -58,12 +58,20 @@ label{display:block;font-size:13px;color:var(--muted);margin:12px 0 6px}.field{w
 <div class="row"><div><label for="date">التاريخ</label><input class="field" id="date" type="date" required></div><div><label for="time">الساعة</label><input class="field" id="time" type="time" required></div></div>
 <div class="row"><div><label for="lead">التنبيه قبل الموعد</label><select class="field" id="lead"><option value="0">في نفس الموعد</option><option value="5">قبلها بـ 5 دقائق</option><option value="10">قبلها بـ 10 دقائق</option><option value="30" selected>قبلها بـ 30 دقيقة</option><option value="60">قبلها بساعة</option><option value="1440">قبلها بيوم</option></select></div><div><label for="repeat">التكرار</label><select class="field" id="repeat"><option value="none">بدون تكرار</option><option value="daily">يومي</option><option value="weekly">أسبوعي</option><option value="monthly">شهري</option></select></div></div>
 <label class="opt" style="margin-top:13px"><input type="checkbox" id="notify" checked> فعّل التنبيه لهذا الموعد</label>
-<div class="hint">سيظهر موعدك في الصفحة الرئيسية في يومه. الإشعارات أثناء إغلاق الموقع بالكامل لا تعمل في هذه النسخة إلا بعد إعداد خدمة Web Push.</div>
+<div class="hint">سيظهر موعدك في الصفحة الرئيسية في يومه، وسيصلك إشعار حتى لو أغلقت الموقع بعد تفعيل الإشعارات.</div>
 <button class="save" type="submit">حفظ الموعد</button>
 </form></div>
 <div class="toast" id="toast"></div>
 <script>
 const KEY='zakerni_tasks_v2', MORNING_KEY='zakerni_morning_v2';
+const API_BASE='https://zakerni-push-api.hanan113066.workers.dev';
+const VAPID_PUBLIC_KEY='BIga14JSz4IboZCRrfhIvWMV1qYoRWI1kPwhYrDAhBpvS6Kj3B004TdPr32zhkEtRtI7IViQ3oGIOZ2ZTzwyu1U';
+const apiReady=()=>!API_BASE.includes('PUT-YOUR') && !VAPID_PUBLIC_KEY.includes('PUT_YOUR');
+async function api(path, options={}){const r=await fetch(API_BASE+path,{...options,headers:{'Content-Type':'application/json',...(options.headers||{})}});if(!r.ok)throw new Error('API '+r.status);return r.json();}
+function toBase64Url(s){const pad='='.repeat((4-s.length%4)%4);const raw=atob((s+pad).replace(/-/g,'+').replace(/_/g,'/'));return Uint8Array.from(raw,c=>c.charCodeAt(0));}
+async function syncCloud(){if(API_BASE.includes('PUT-YOUR'))return;try{const local=[...tasks];const result=await api('/api/appointments');const remote=result.appointments||[];const ids=new Set(remote.map(t=>String(t.id)));const missing=local.filter(t=>!ids.has(String(t.id)));for(const t of missing)await api('/api/appointments',{method:'POST',body:JSON.stringify(t)});tasks=[...remote,...missing];localStorage.setItem(KEY,JSON.stringify(tasks));render();renderToday();}catch(e){console.warn('Cloud sync unavailable',e);toast('تعذر الاتصال بالسحابة؛ البيانات المحلية ما زالت محفوظة');}}
+async function saveCloudTask(task){if(API_BASE.includes('PUT-YOUR'))return;try{await api('/api/appointments',{method:'POST',body:JSON.stringify(task)});}catch(e){console.error(e);toast('اتحفظ محليًا، لكن المزامنة السحابية فشلت');}}
+async function removeCloudTask(id){if(API_BASE.includes('PUT-YOUR'))return;try{await api('/api/appointments/'+encodeURIComponent(id),{method:'DELETE'});}catch(e){console.error(e);toast('الحذف من السحابة لم يكتمل');}}
 const categories={
  patients:{label:'زيارة مرضى',icon:'🏥'},
  private:{label:'زيارات خاصة',icon:'🤝'},
@@ -73,7 +81,7 @@ const categories={
 };
 let tasks=load(), filter='today', categoryView='all', editing=null, notified=new Set();
 function load(){try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch{return []}}
-function persist(){localStorage.setItem(KEY,JSON.stringify(tasks))}
+function persist(){localStorage.setItem(KEY,JSON.stringify(tasks));tasks.forEach(saveCloudTask)}
 const $=id=>document.getElementById(id), pad=n=>String(n).padStart(2,'0');
 function today(){let d=new Date();return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`}
 function asDate(t){return new Date(`${t.date}T${t.time||'23:59'}:00`)}
@@ -159,12 +167,21 @@ $('taskForm').onsubmit=e=>{
 $('taskList').onclick=e=>{let b=e.target.closest('[data-act]');if(!b)return;let t=tasks.find(x=>x.id===b.dataset.id);if(!t)return;
  if(b.dataset.act==='toggle'){t.done=!t.done;persist();render()}
  if(b.dataset.act==='edit')openForm(t.category,t);
- if(b.dataset.act==='delete'&&confirm('متأكد إنك عايز تحذف الموعد؟')){tasks=tasks.filter(x=>x.id!==t.id);persist();render();toast('تم حذف الموعد')}
+ if(b.dataset.act==='delete'&&confirm('متأكد إنك عايز تحذف الموعد؟')){tasks=tasks.filter(x=>x.id!==t.id);localStorage.setItem(KEY,JSON.stringify(tasks));removeCloudTask(t.id);render();toast('تم حذف الموعد')}
 };
 $('notifyBtn').onclick=async()=>{
- if(!('Notification'in window)){toast('الإشعارات غير مدعومة في هذا المتصفح');return}
- try{let p=await Notification.requestPermission();toast(p==='granted'?'تم السماح بالإشعارات ✓':'لم يتم السماح بالإشعارات')}
- catch{toast('تعذر تفعيل الإشعارات')}
+ if(!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)){toast('المتصفح لا يدعم إشعارات Push؛ افتح الموقع من Safari أو Chrome حديث');return}
+ if(API_BASE.includes('PUT-YOUR') || VAPID_PUBLIC_KEY.includes('PUT_YOUR')){toast('لازم نكمل إعداد رابط Cloudflare ومفتاح الإشعارات أولًا');return}
+ try{
+  const permission=await Notification.requestPermission();
+  if(permission!=='granted'){toast('اسمح بالإشعارات من إعدادات المتصفح');return;}
+  const reg=await navigator.serviceWorker.ready;
+  let sub=await reg.pushManager.getSubscription();
+  if(!sub) sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:toBase64Url(VAPID_PUBLIC_KEY)});
+  await api('/api/push/subscribe',{method:'POST',body:JSON.stringify({subscription:sub.toJSON()})});
+  await api('/api/push/test',{method:'POST',body:'{}'});
+  toast('تم تفعيل الإشعارات! راجع إشعار التجربة ✓');
+ }catch(e){console.error(e);toast('فشل تفعيل الإشعارات: '+(e.message||'تحقق من الإعدادات'));}
 };
 function sendNotice(title,body,tag){if(!('Notification'in window)||Notification.permission!=='granted')return;try{new Notification(title,{body,icon:'icon-192.png',tag})}catch{}}
 function checkNotifications(){
@@ -199,6 +216,6 @@ $('todayList').onclick=e=>{let b=e.target.closest('[data-home-act]');if(!b)retur
 const originalRender=render;render=function(){originalRender();if($('todayList'))renderToday();};
 
 if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
-render();renderToday();showHome();checkNotifications();setInterval(()=>{checkNotifications();render();renderToday()},15000);
+render();renderToday();showHome();checkNotifications();syncCloud();setInterval(()=>{checkNotifications();render();renderToday()},15000);
 </script>
 </body></html>
