@@ -58,7 +58,7 @@ header{padding:27px 2px 22px;border-bottom:1px solid rgba(221,231,239,.8);margin
  <div class="brand"><div class="logo">◷</div><div><h1>ذكّرني</h1><p>مواعيدك المهمة في مكان واحد</p></div></div>
  <div class="head-actions"><button class="iconbtn" id="manageBtn" title="الأقسام وإدارة المواعيد">☷</button><button class="iconbtn" id="notifyBtn" title="تفعيل الإشعارات">♧</button></div>
 </header>
-<section class="hero"><small id="todayLabel">مواعيد اليوم</small><h2>أهلاً ابونا لوقا 👋</h2><p id="heroText">كل مهام يومك هتظهر هنا، علشان تتابعها بسهولة.</p></section>
+<section class="hero"><small id="todayLabel">مواعيد اليوم</small><h2>أهلاً أبونا لوقا 👋</h2><p id="heroText">كل مهام يومك هتظهر هنا، علشان تتابعها بسهولة.</p></section>
 <div class="stats"><div class="stat"><strong id="todayCount">0</strong><span>مطلوب اليوم</span></div><div class="stat"><strong id="upcomingCount">0</strong><span>مواعيد قادمة</span></div><div class="stat"><strong id="doneCount">0</strong><span>تم إنجازه</span></div></div>
 <div class="sectionhead"><h3>مواعيد اليوم فقط</h3><span class="muted" id="todayListCount"></span></div>
 <div class="list" id="todayList" style="margin-top:12px"></div>
@@ -81,6 +81,9 @@ header{padding:27px 2px 22px;border-bottom:1px solid rgba(221,231,239,.8);margin
 <div class="row"><div><label for="date">التاريخ</label><input class="field" id="date" type="date" required></div><div><label for="time">الساعة</label><input class="field" id="time" type="time" required></div></div>
 <div class="row"><div><label for="lead">التنبيه قبل الموعد</label><select class="field" id="lead"><option value="0">في نفس الموعد</option><option value="5">قبلها بـ 5 دقائق</option><option value="10">قبلها بـ 10 دقائق</option><option value="30" selected>قبلها بـ 30 دقيقة</option><option value="60">قبلها بساعة</option><option value="1440">قبلها بيوم</option></select></div><div><label for="repeat">تكرار الموعد</label><select class="field" id="repeat"><option value="none">بدون تكرار</option><option value="daily">يومي</option><option value="weekly">أسبوعي</option><option value="monthly">شهري</option></select></div></div>
 <div><label for="alertRepeat">تكرار التنبيه لحد موعد المهمة</label><select class="field" id="alertRepeat"><option value="0">مرة واحدة فقط</option><option value="30">كل نصف ساعة</option><option value="60">كل ساعة</option><option value="120">كل ساعتين</option><option value="360">كل 6 ساعات</option><option value="720">كل 12 ساعة</option><option value="1440">كل يوم</option></select></div>
+<div class="row"><div><label for="messageType">نوع رسالة التنبيه</label><select class="field" id="messageType"><option value="short">رسالة مختصرة</option><option value="long">رسالة طويلة (تفاصيل الموعد)</option><option value="custom">رسالة مخصصة</option></select></div><div><label for="messageTitle">عنوان الرسالة</label><input class="field" id="messageTitle" maxlength="90" placeholder="تذكير بموعدك"></div></div>
+<div id="customMessageFields" hidden><label for="messageBody">نص الرسالة المخصصة</label><textarea class="field" id="messageBody" rows="3" maxlength="500" placeholder="اكتب نص التنبيه اللي تحبه"></textarea></div>
+<div class="hint" style="margin-top:9px">تقدر تختار رسالة مختصرة أو طويلة أو تكتب رسالتك بنفسك. صوت الإشعار نفسه بيتحكم فيه iPhone وإعدادات النظام، ومش متاح للموقع يفرض نغمة مخصصة.</div>
 <label class="opt" style="margin-top:13px"><input type="checkbox" id="notify" checked> فعّل التنبيه لهذا الموعد</label>
 <div class="hint">هيوصلك ملخص بكل مواعيد اليوم يوميًا الساعة 8 صباحًا، وبعدها تنبيه كل مهمة في الوقت اللي اخترته. ويمكنك تكرار تنبيه المهمة لحد موعدها.</div>
 <button class="save" type="submit">حفظ الموعد</button>
@@ -93,9 +96,9 @@ const VAPID_PUBLIC_KEY='BIga14JSz4IboZCRrfhIvWMV1qYoRWI1kPwhYrDAhBpvS6Kj3B004TdP
 const apiReady=()=>!API_BASE.includes('PUT-YOUR') && !VAPID_PUBLIC_KEY.includes('PUT_YOUR');
 async function api(path, options={}){const r=await fetch(API_BASE+path,{...options,headers:{'Content-Type':'application/json',...(options.headers||{})}});if(!r.ok)throw new Error('API '+r.status);return r.json();}
 function toBase64Url(s){const pad='='.repeat((4-s.length%4)%4);const raw=atob((s+pad).replace(/-/g,'+').replace(/_/g,'/'));return Uint8Array.from(raw,c=>c.charCodeAt(0));}
-async function syncCloud(){if(API_BASE.includes('PUT-YOUR'))return;try{const local=[...tasks];const result=await api('/api/appointments');const remote=result.appointments||[];const ids=new Set(remote.map(t=>String(t.id)));const missing=local.filter(t=>!ids.has(String(t.id)));for(const t of missing)await api('/api/appointments',{method:'POST',body:JSON.stringify(t)});tasks=[...remote,...missing];localStorage.setItem(KEY,JSON.stringify(tasks));render();renderToday();}catch(e){console.warn('Cloud sync unavailable',e);toast('تعذر الاتصال بالسحابة؛ البيانات المحلية ما زالت محفوظة');}}
+async function syncCloud(){if(API_BASE.includes('PUT-YOUR'))return;try{const local=[...tasks];const result=await api('/api/appointments');const remote=result.appointments||[];const deleted=new Set((result.deletedIds||[]).map(String));const ids=new Set(remote.map(t=>String(t.id)));const missing=local.filter(t=>!ids.has(String(t.id))&&!deleted.has(String(t.id)));for(const t of missing)await api('/api/appointments',{method:'POST',body:JSON.stringify(t)});tasks=[...remote,...missing.filter(t=>!deleted.has(String(t.id)))];localStorage.setItem(KEY,JSON.stringify(tasks));render();renderToday();}catch(e){console.warn('Cloud sync unavailable',e);toast('تعذر الاتصال بالسحابة؛ البيانات المحلية ما زالت محفوظة');}}
 async function saveCloudTask(task){if(API_BASE.includes('PUT-YOUR'))return;try{await api('/api/appointments',{method:'POST',body:JSON.stringify(task)});}catch(e){console.error(e);toast('اتحفظ محليًا، لكن المزامنة السحابية فشلت');}}
-async function removeCloudTask(id){if(API_BASE.includes('PUT-YOUR'))return;try{await api('/api/appointments/'+encodeURIComponent(id),{method:'DELETE'});}catch(e){console.error(e);toast('الحذف من السحابة لم يكتمل');}}
+async function removeCloudTask(id){if(API_BASE.includes('PUT-YOUR'))return true;try{const result=await api('/api/appointments/'+encodeURIComponent(id),{method:'DELETE'});return !!result.deleted;}catch(e){console.error(e);toast('تعذر تأكيد الحذف من السحابة؛ حاول مرة أخرى عند اتصال الإنترنت');return false;}}
 const categories={
  patients:{label:'زيارة مرضى',icon:'🏥'},
  private:{label:'زيارات خاصة',icon:'🤝'},
@@ -165,14 +168,14 @@ function openForm(cat='patients',task=null){
  renderFields($('category').value,task||{});
  $('date').value=task?.date||today();
  let now=new Date();$('time').value=task?.time||`${pad(now.getHours())}:${pad(now.getMinutes())}`;
- $('lead').value=String(task?.lead??30);$('repeat').value=task?.repeat||'none';$('alertRepeat').value=String(task?.alertRepeatMinutes??0);$('notify').checked=task?.notify!==false;
+ $('lead').value=String(task?.lead??30);$('repeat').value=task?.repeat||'none';$('alertRepeat').value=String(task?.alertRepeatMinutes??0);$('notify').checked=task?.notify!==false;$('messageType').value=task?.messageType||'short';$('messageTitle').value=task?.messageTitle||'';$('messageBody').value=task?.messageBody||'';$('customMessageFields').hidden=$('messageType').value!=='custom';
  $('modal').classList.add('show');
 }
 function closeForm(){$('modal').classList.remove('show');editing=null}
 document.querySelectorAll('[data-cat]').forEach(b=>b.onclick=()=>{let c=b.dataset.cat;if(c==='all'){categoryView='all';filter='all';syncTabs();render()}else openForm(c)});
 $('addBtn').onclick=()=>openForm(categoryView!=='all'?categoryView:'patients');
 $('closeBtn').onclick=closeForm;$('modal').addEventListener('click',e=>{if(e.target===$('modal'))closeForm()});
-$('category').onchange=()=>renderFields($('category').value,{});
+$('category').onchange=()=>renderFields($('category').value,{});$('messageType').onchange=()=>$('customMessageFields').hidden=$('messageType').value!=='custom';
 function syncTabs(){document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.filter===filter))}
 $('tabs').onclick=e=>{let b=e.target.closest('[data-filter]');if(!b)return;filter=b.dataset.filter;categoryView='all';syncTabs();render()};
 $('taskForm').onsubmit=e=>{
@@ -184,14 +187,14 @@ $('taskForm').onsubmit=e=>{
  if((cat==='weddings'||cat==='engagements')&&!name){toast('اكتب الاسم');return}
  if(cat==='special'&&!place){toast('اكتب المكان');return}
  let visitTypes=[...document.querySelectorAll('input[name="visitType"]:checked')].map(x=>x.value);
- let data={id:editing||crypto.randomUUID(),category:cat,name,place,notes:$('notes')?.value.trim()||'',visitTypes,date:$('date').value,time:$('time').value,lead:Number($('lead').value),repeat:$('repeat').value,alertRepeatMinutes:Number($('alertRepeat').value),notify:$('notify').checked,done:false,created:Date.now()};
+ let data={id:editing||crypto.randomUUID(),category:cat,name,place,notes:$('notes')?.value.trim()||'',visitTypes,date:$('date').value,time:$('time').value,lead:Number($('lead').value),repeat:$('repeat').value,alertRepeatMinutes:Number($('alertRepeat').value),messageType:$('messageType').value,messageTitle:$('messageTitle').value.trim(),messageBody:$('messageBody').value.trim(),notify:$('notify').checked,done:false,created:Date.now()};
  if(editing){let old=tasks.find(t=>t.id===editing);data.done=old?.done||false;tasks=tasks.map(t=>t.id===editing?data:t)}else tasks.push(data);
  persist();closeForm();categoryView='all';filter='today';syncTabs();render();toast('اتحفظ الموعد بنجاح ✓');checkNotifications();
 };
 $('taskList').onclick=e=>{let b=e.target.closest('[data-act]');if(!b)return;let t=tasks.find(x=>x.id===b.dataset.id);if(!t)return;
  if(b.dataset.act==='toggle'){t.done=!t.done;persist();render()}
  if(b.dataset.act==='edit')openForm(t.category,t);
- if(b.dataset.act==='delete'&&confirm('متأكد إنك عايز تحذف الموعد؟')){tasks=tasks.filter(x=>x.id!==t.id);localStorage.setItem(KEY,JSON.stringify(tasks));removeCloudTask(t.id);render();toast('تم حذف الموعد')}
+ if(b.dataset.act==='delete'&&confirm('متأكد إنك عايز تحذف الموعد؟')){(async()=>{if(await removeCloudTask(t.id)){tasks=tasks.filter(x=>String(x.id)!==String(t.id));localStorage.setItem(KEY,JSON.stringify(tasks));render();toast('تم حذف الموعد نهائيًا من كل الأجهزة');}})()}
 };
 $('notifyBtn').onclick=async()=>{
  if(!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)){toast('المتصفح لا يدعم إشعارات Push؛ افتح الموقع من Safari أو Chrome حديث');return}
@@ -225,12 +228,13 @@ function renderToday(){
  $('todayListCount').textContent=arr.length+' موعد';
  const list=$('todayList');
  if(!arr.length){list.innerHTML='<div class="empty"><strong>مفيش مواعيد مسجلة لليوم 🎉</strong>افتح الأقسام لإضافة موعد جديد.</div>';return;}
- list.innerHTML=arr.map(t=>{let meta=[`${categories[t.category]?.icon||'◷'} ${categories[t.category]?.label||'موعد'}`,`⏰ ${escapeHtml(t.time||'بدون ساعة')}`];if(t.done)meta.push('تم');return `<article class="task ${t.done?'done':''}"><button class="check" data-home-act="toggle" data-id="${t.id}">${t.done?'✓':''}</button><div class="taskbody"><div class="tasktitle">${escapeHtml(taskName(t))}</div>${taskDesc(t)?`<div class="taskdesc">${escapeHtml(taskDesc(t))}</div>`:''}<div class="meta">${meta.map(m=>`<span class="pill">${m}</span>`).join('')}</div></div><div class="actions"><button class="mini" data-home-act="edit" data-id="${t.id}">✎</button></div></article>`}).join('');
+ list.innerHTML=arr.map(t=>{let meta=[`${categories[t.category]?.icon||'◷'} ${categories[t.category]?.label||'موعد'}`,`⏰ ${escapeHtml(t.time||'بدون ساعة')}`];if(t.done)meta.push('تم');return `<article class="task ${t.done?'done':''}"><button class="check" data-home-act="toggle" data-id="${t.id}">${t.done?'✓':''}</button><div class="taskbody"><div class="tasktitle">${escapeHtml(taskName(t))}</div>${taskDesc(t)?`<div class="taskdesc">${escapeHtml(taskDesc(t))}</div>`:''}<div class="meta">${meta.map(m=>`<span class="pill">${m}</span>`).join('')}</div></div><div class="actions"><button class="mini" data-home-act="edit" data-id="${t.id}" aria-label="تعديل">✎</button><button class="mini" data-home-act="delete" data-id="${t.id}" aria-label="حذف الموعد">⌫</button></div></article>`}).join('');
 }
 function showManage(){ $('managePage').hidden=false; document.querySelector('.hero').hidden=true;document.querySelector('.stats').hidden=true;document.querySelectorAll('.app > .sectionhead,.app > .list,.home-actions,.app > .footer').forEach(el=>el.hidden=true);$('manageBtn').hidden=true;$('addBtn').hidden=false;render();}
 function showHome(){ $('managePage').hidden=true;document.querySelector('.hero').hidden=false;document.querySelector('.stats').hidden=false;document.querySelectorAll('.app > .sectionhead,.app > .list,.home-actions,.app > .footer').forEach(el=>el.hidden=false);$('manageBtn').hidden=false;render();renderToday();}
 $('manageBtn').onclick=showManage;$('openManage').onclick=showManage;$('backHome').onclick=showHome;
-$('todayList').onclick=e=>{let b=e.target.closest('[data-home-act]');if(!b)return;let t=tasks.find(x=>x.id===b.dataset.id);if(!t)return;if(b.dataset.homeAct==='toggle'){t.done=!t.done;persist();render();renderToday()}else{showManage();openForm(t.category,t)}};
+$('todayList').onclick=e=>{let b=e.target.closest('[data-home-act]');if(!b)return;let t=tasks.find(x=>x.id===b.dataset.id);if(!t)return;if(b.dataset.homeAct==='toggle'){t.done=!t.done;persist();render();renderToday()}else if(b.dataset.homeAct==='delete'){if(confirm(`حذف الموعد ${taskName(t)}؟
+سيتم حذفه سواء كان مكتملًا أو لا.`)){(async()=>{if(await removeCloudTask(t.id)){tasks=tasks.filter(x=>String(x.id)!==String(t.id));localStorage.setItem(KEY,JSON.stringify(tasks));render();renderToday();toast('تم حذف الموعد نهائيًا من كل الأجهزة');}})()}}else{showManage();openForm(t.category,t)}};
 const originalRender=render;render=function(){originalRender();if($('todayList'))renderToday();};
 
 if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
