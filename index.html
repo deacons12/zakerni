@@ -72,6 +72,9 @@ header{padding:27px 2px 22px;border-bottom:1px solid rgba(221,231,239,.8);margin
 <button class="catbtn" data-cat="weddings"><span class="caticon">💍</span><span><strong>أكاليل</strong><small>إضافة موعد إكليل</small></span></button>
 <button class="catbtn" data-cat="engagements"><span class="caticon">💐</span><span><strong>خطوبات</strong><small>إضافة موعد خطوبة</small></span></button>
 <button class="catbtn" data-cat="special"><span class="caticon">📌</span><span><strong>مواعيد خاصة</strong><small>إضافة موعد خاص</small></span></button>
+<button class="catbtn" data-cat="tash"><span class="caticon">🕯️</span><span><strong>صلاة الطشت</strong><small>إضافة موعد صلاة الطشت</small></span></button>
+<button class="catbtn" data-cat="houseBlessing"><span class="caticon">🏠</span><span><strong>تبريك منازل</strong><small>إضافة موعد تبريك منزل</small></span></button>
+<button class="catbtn" type="button" id="massTimesBtn"><span class="caticon">⛪</span><span><strong>مواعيد القداسات</strong><small>عرض صورة مواعيد القداسات</small></span></button>
 </div>
 <div class="sectionhead"><h3>مواعيد اليوم فقط</h3><span class="muted" id="todayListCount"></span></div>
 <div class="list" id="todayList" style="margin-top:12px"></div>
@@ -88,7 +91,7 @@ header{padding:27px 2px 22px;border-bottom:1px solid rgba(221,231,239,.8);margin
 <div class="modal" id="modal"><form class="sheet" id="taskForm">
 <div class="sheethead"><h3 id="formTitle">إضافة موعد</h3><button class="close" type="button" id="closeBtn">×</button></div>
 <label for="category">القسم</label><select class="field" id="category" required>
-<option value="patients">زيارة مرضى</option><option value="private">زيارات خاصة</option><option value="weddings">أكاليل</option><option value="engagements">خطوبات</option><option value="special">مواعيد خاصة</option>
+<option value="patients">زيارة مرضى</option><option value="private">زيارات خاصة</option><option value="weddings">أكاليل</option><option value="engagements">خطوبات</option><option value="special">مواعيد خاصة</option><option value="tash">صلاة الطشت</option><option value="houseBlessing">تبريك منازل</option>
 </select>
 <div id="dynamicFields"></div>
 <div class="row"><div><label for="date">التاريخ</label><input class="field" id="date" type="date" required></div><div><label for="time">الساعة</label><input class="field" id="time" type="time" required></div></div>
@@ -101,6 +104,7 @@ header{padding:27px 2px 22px;border-bottom:1px solid rgba(221,231,239,.8);margin
 <div class="hint">هيوصلك ملخص بكل مواعيد اليوم يوميًا الساعة 8 صباحًا، وبعدها تنبيه كل مهمة في الوقت اللي اخترته. ويمكنك تكرار تنبيه المهمة لحد موعدها.</div>
 <button class="save" type="submit">حفظ الموعد</button>
 </form></div>
+<div class="modal" id="massTimesModal" style="z-index:8"><div class="sheet"><div class="sheethead"><h3>مواعيد القداسات</h3><button class="close" type="button" id="closeMassTimes">×</button></div><div id="massTimesContent" style="text-align:center"><div class="empty"><strong>لم تتم إضافة صورة بعد</strong>اضغط على «إضافة صورة» لاختيار صورة مواعيد القداسات من جهازك.</div></div><input id="massTimesFile" type="file" accept="image/*" hidden><button class="save" type="button" id="uploadMassTimes">＋ إضافة صورة / تغيير الصورة</button><button class="tab" type="button" id="removeMassTimes" style="width:100%;margin-top:9px;color:#c43d58;display:none">حذف الصورة</button></div></div>
 <div class="toast" id="toast"></div>
 <script>
 const KEY='zakerni_tasks_v2', MORNING_KEY='zakerni_morning_v2';
@@ -118,9 +122,12 @@ const categories={
  private:{label:'زيارات خاصة',icon:'🤝'},
  weddings:{label:'أكاليل',icon:'💍'},
  engagements:{label:'خطوبات',icon:'💐'},
- special:{label:'مواعيد خاصة',icon:'📌'}
+ special:{label:'مواعيد خاصة',icon:'📌'},
+ tash:{label:'صلاة الطشت',icon:'🕯️'},
+ houseBlessing:{label:'تبريك منازل',icon:'🏠'}
 };
 let tasks=load(), filter='today', categoryView='all', editing=null, notified=new Set();
+const MASS_IMAGE_KEY='zakerni_mass_times_image_v1';
 function load(){try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch{return []}}
 function persist(){localStorage.setItem(KEY,JSON.stringify(tasks));tasks.forEach(saveCloudTask)}
 const $=id=>document.getElementById(id), pad=n=>String(n).padStart(2,'0');
@@ -164,12 +171,12 @@ function render(){
 function toast(msg){$('toast').textContent=msg;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2600)}
 function renderFields(cat, task={}){
  let el=$('dynamicFields');
- let nameLabel=cat==='patients'?'اسم المريض':cat==='private'?'الاسم':cat==='weddings'?'اسم العروسين':cat==='engagements'?'اسم المخطوبين':'اسم الموعد (اختياري)';
+ let nameLabel=cat==='patients'?'اسم المريض':cat==='private'?'الاسم':cat==='weddings'?'اسم العروسين':cat==='engagements'?'اسم المخطوبين':cat==='tash'?'اسم صاحب صلاة الطشت':cat==='houseBlessing'?'اسم صاحب المنزل':'اسم الموعد (اختياري)';
  let html='';
  if(cat!=='special')html+=`<label for="name">${nameLabel}</label><input class="field" id="name" maxlength="120" ${cat==='special'?'':'required'} placeholder="${nameLabel}">`;
  if(cat==='patients')html+=`<label for="place">مكان الزيارة</label><select class="field" id="place" required><option value="home">البيت</option><option value="hospital">مستشفى</option></select>`;
  if(cat==='private')html+=`<label>نوع الزيارة (اختياري، ممكن تختار أكتر من بند)</label><div class="optionbox"><label class="opt"><input type="checkbox" name="visitType" value="تبريك منازل"> تبريك منازل</label><label class="opt"><input type="checkbox" name="visitType" value="صلاة طشت"> صلاة طشت</label><label class="opt"><input type="checkbox" name="visitType" value="افتقاد شخصي"> افتقاد شخصي</label></div><label for="place">المكان (اختياري)</label><input class="field" id="place" placeholder="اكتب المكان">`;
- if(cat==='weddings'||cat==='engagements'||cat==='special')html+=`<label for="place">المكان</label><input class="field" id="place" ${cat==='special'?'':'required'} placeholder="اكتب المكان">`;
+ if(cat==='weddings'||cat==='engagements'||cat==='special'||cat==='tash'||cat==='houseBlessing')html+=`<label for="place">المكان</label><input class="field" id="place" ${cat==='special'?'':'required'} placeholder="اكتب المكان">`;
  if(cat==='patients'||cat==='private')html+=`<label for="notes">ملاحظات (اختياري)</label><input class="field" id="notes" maxlength="250" placeholder="تفاصيل إضافية">`;
  el.innerHTML=html;
  if($('name'))$('name').value=task.name||'';
@@ -201,7 +208,7 @@ $('taskForm').onsubmit=e=>{
  let place=$('place')?.value.trim()||'';
  if(cat==='patients'&&!name){toast('اكتب اسم المريض');return}
  if(cat==='private'&&!name){toast('اكتب الاسم');return}
- if((cat==='weddings'||cat==='engagements')&&!name){toast('اكتب الاسم');return}
+ if((cat==='weddings'||cat==='engagements'||cat==='tash'||cat==='houseBlessing')&&!name){toast('اكتب الاسم');return}
  if(cat==='special'&&!place){toast('اكتب المكان');return}
  let visitTypes=[...document.querySelectorAll('input[name="visitType"]:checked')].map(x=>x.value);
  let data={id:editing||crypto.randomUUID(),category:cat,name,place,notes:$('notes')?.value.trim()||'',visitTypes,date:$('date').value,time:$('time').value,lead:Number($('lead').value),repeat:$('repeat').value,alertRepeatMinutes:Number($('alertRepeat').value),messageType:$('messageType').value,messageTitle:$('messageTitle').value.trim(),messageBody:$('messageBody').value.trim(),notify:$('notify').checked,done:false,created:Date.now()};
@@ -213,6 +220,19 @@ $('taskList').onclick=e=>{let b=e.target.closest('[data-act]');if(!b)return;let 
  if(b.dataset.act==='edit')openForm(t.category,t);
  if(b.dataset.act==='delete'&&confirm('متأكد إنك عايز تحذف الموعد؟')){(async()=>{if(await removeCloudTask(t.id)){tasks=tasks.filter(x=>String(x.id)!==String(t.id));localStorage.setItem(KEY,JSON.stringify(tasks));render();toast('تم حذف الموعد نهائيًا من كل الأجهزة');}})()}
 };
+function openMassTimes(){
+ const saved=localStorage.getItem(MASS_IMAGE_KEY), box=$('massTimesContent');
+ if(saved){box.innerHTML=`<img src="${saved}" alt="صورة مواعيد القداسات" style="display:block;width:100%;height:auto;max-height:65vh;object-fit:contain;border-radius:14px;background:#f4f7fb">`;$('removeMassTimes').style.display='block';}
+ else{box.innerHTML='<div class="empty"><strong>لم تتم إضافة صورة بعد</strong>اضغط على «إضافة صورة» لاختيار صورة مواعيد القداسات من جهازك.</div>';$('removeMassTimes').style.display='none';}
+ $('massTimesModal').classList.add('show');
+}
+$('massTimesBtn').addEventListener('click',openMassTimes);
+$('closeMassTimes').addEventListener('click',()=>$('massTimesModal').classList.remove('show'));
+$('massTimesModal').addEventListener('click',e=>{if(e.target===$('massTimesModal'))$('massTimesModal').classList.remove('show')});
+$('uploadMassTimes').addEventListener('click',()=>$('massTimesFile').click());
+$('massTimesFile').addEventListener('change',e=>{const file=e.target.files?.[0];if(!file)return;if(!file.type.startsWith('image/')){toast('اختار ملف صورة من فضلك');return;}const reader=new FileReader();reader.onload=()=>{const img=new Image();img.onload=()=>{const scale=Math.min(1,1800/Math.max(img.width,img.height));const canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(img.width*scale));canvas.height=Math.max(1,Math.round(img.height*scale));canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);const data=canvas.toDataURL('image/jpeg',.82);try{localStorage.setItem(MASS_IMAGE_KEY,data);openMassTimes();toast('تم حفظ صورة مواعيد القداسات على الجهاز ✓');}catch(err){toast('الصورة كبيرة جدًا؛ اختار صورة أصغر');}};img.onerror=()=>toast('تعذر قراءة الصورة');img.src=reader.result;};reader.readAsDataURL(file);e.target.value='';});
+$('removeMassTimes').addEventListener('click',()=>{if(confirm('حذف صورة مواعيد القداسات؟')){localStorage.removeItem(MASS_IMAGE_KEY);openMassTimes();toast('تم حذف الصورة');}});
+
 $('notifyBtn').onclick=async()=>{
  if(!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)){toast('المتصفح لا يدعم إشعارات Push؛ افتح الموقع من Safari أو Chrome حديث');return}
  if(API_BASE.includes('PUT-YOUR') || VAPID_PUBLIC_KEY.includes('PUT_YOUR')){toast('لازم نكمل إعداد رابط Cloudflare ومفتاح الإشعارات أولًا');return}
