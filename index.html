@@ -71,7 +71,7 @@ header{padding:27px 2px 22px;border-bottom:1px solid rgba(221,231,239,.8);margin
 <button class="catbtn" data-cat="private"><span class="caticon">🤝</span><span><strong>زيارات خاصة</strong><small>إضافة زيارة خاصة</small></span></button>
 <button class="catbtn" data-cat="weddings"><span class="caticon">💍</span><span><strong>أكاليل</strong><small>إضافة موعد إكليل</small></span></button>
 <button class="catbtn" data-cat="engagements"><span class="caticon">💐</span><span><strong>خطوبات</strong><small>إضافة موعد خطوبة</small></span></button>
-<button class="catbtn" data-cat="special"><span class="caticon">📌</span><span><strong>مواعيد خاصة</strong><small>إضافة موعد خاص</small></span></button>
+<button class="catbtn" data-cat="special"><span class="caticon">📌</span><span><strong>افتقاد شخصي</strong><small>افتقاد شخصي</small></span></button>
 <button class="catbtn" data-cat="tash"><span class="caticon">🕯️</span><span><strong>صلاة الطشت</strong><small>إضافة موعد صلاة الطشت</small></span></button>
 <button class="catbtn" data-cat="houseBlessing"><span class="caticon">🏠</span><span><strong>تبريك منازل</strong><small>إضافة موعد تبريك منزل</small></span></button>
 <button class="catbtn" type="button" id="massTimesBtn"><span class="caticon">⛪</span><span><strong>مواعيد القداسات</strong><small>عرض صورة مواعيد القداسات</small></span></button>
@@ -84,14 +84,14 @@ header{padding:27px 2px 22px;border-bottom:1px solid rgba(221,231,239,.8);margin
 <div class="tabs" id="tabs"><button class="tab active" data-filter="today">مطلوب اليوم</button><button class="tab" data-filter="upcoming">مواعيد قادمة</button><button class="tab" data-filter="done">تم إنجازه</button><button class="tab" data-filter="pending">لم يتم إنجازه</button><button class="tab" data-filter="late">المتأخرة</button><button class="tab" data-filter="all">الكل</button></div>
 <div class="list" id="taskList" style="margin-top:12px"></div>
 </section>
-<div class="footer">المواعيد محفوظة على جهازك ومتزامنة مع السحابة عند اكتمال الإعداد.<br>ملخص يومي الساعة 8 صباحًا، وتنبيهات المهام حسب اختياراتك حتى لو التطبيق مغلق.</div>
+<div class="footer">المواعيد محفوظة على جهازك ومتزامنة مع السحابة عند اكتمال الإعداد.<br>ملخص يومي الساعة 8 صباحًا، وتنبيهات المهام حسب اختياراتك  .</div>
 </div>
 
 
 <div class="modal" id="modal"><form class="sheet" id="taskForm">
 <div class="sheethead"><h3 id="formTitle">إضافة موعد</h3><button class="close" type="button" id="closeBtn">×</button></div>
 <label for="category">القسم</label><select class="field" id="category" required>
-<option value="patients">زيارة مرضى</option><option value="private">زيارات خاصة</option><option value="weddings">أكاليل</option><option value="engagements">خطوبات</option><option value="special">مواعيد خاصة</option><option value="tash">صلاة الطشت</option><option value="houseBlessing">تبريك منازل</option>
+<option value="patients">زيارة مرضى</option><option value="private">افتقاد شخصي</option><option value="weddings">أكاليل</option><option value="engagements">خطوبات</option><option value="special">مواعيد خاصة</option><option value="tash">صلاة الطشت</option><option value="houseBlessing">تبريك منازل</option>
 </select>
 <div id="dynamicFields"></div>
 <div class="row"><div><label for="date">التاريخ</label><input class="field" id="date" type="date" required></div><div><label for="time">الساعة</label><input class="field" id="time" type="time" required></div></div>
