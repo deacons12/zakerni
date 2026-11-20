@@ -71,10 +71,11 @@ header{padding:27px 2px 22px;border-bottom:1px solid rgba(221,231,239,.8);margin
 <button class="catbtn" data-cat="private"><span class="caticon">🤝</span><span><strong>زيارات خاصة</strong><small>إضافة زيارة خاصة</small></span></button>
 <button class="catbtn" data-cat="weddings"><span class="caticon">💍</span><span><strong>أكاليل</strong><small>إضافة موعد إكليل</small></span></button>
 <button class="catbtn" data-cat="engagements"><span class="caticon">💐</span><span><strong>خطوبات</strong><small>إضافة موعد خطوبة</small></span></button>
-<button class="catbtn" data-cat="special"><span class="caticon">📌</span><span><strong>افتقاد شخصي</strong><small>افتقاد شخصي</small></span></button>
+<button class="catbtn" data-cat="special"><span class="caticon">📌</span><span><strong>مواعيد خاصة</strong><small>إضافة موعد خاص</small></span></button>
 <button class="catbtn" data-cat="tash"><span class="caticon">🕯️</span><span><strong>صلاة الطشت</strong><small>إضافة موعد صلاة الطشت</small></span></button>
 <button class="catbtn" data-cat="houseBlessing"><span class="caticon">🏠</span><span><strong>تبريك منازل</strong><small>إضافة موعد تبريك منزل</small></span></button>
 <button class="catbtn" type="button" id="massTimesBtn"><span class="caticon">⛪</span><span><strong>مواعيد القداسات</strong><small>عرض صورة مواعيد القداسات</small></span></button>
+<button class="catbtn" type="button" id="notesBtn"><span class="caticon">📝</span><span><strong>ملاحظات</strong><small>تسجيل ملاحظات بدون مواعيد أو تنبيهات</small></span></button>
 </div>
 <div class="sectionhead"><h3>مواعيد اليوم فقط</h3><span class="muted" id="todayListCount"></span></div>
 <div class="list" id="todayList" style="margin-top:12px"></div>
@@ -84,14 +85,14 @@ header{padding:27px 2px 22px;border-bottom:1px solid rgba(221,231,239,.8);margin
 <div class="tabs" id="tabs"><button class="tab active" data-filter="today">مطلوب اليوم</button><button class="tab" data-filter="upcoming">مواعيد قادمة</button><button class="tab" data-filter="done">تم إنجازه</button><button class="tab" data-filter="pending">لم يتم إنجازه</button><button class="tab" data-filter="late">المتأخرة</button><button class="tab" data-filter="all">الكل</button></div>
 <div class="list" id="taskList" style="margin-top:12px"></div>
 </section>
-<div class="footer">المواعيد محفوظة على جهازك ومتزامنة مع السحابة عند اكتمال الإعداد.<br>ملخص يومي الساعة 8 صباحًا، وتنبيهات المهام حسب اختياراتك  .</div>
+<div class="footer">المواعيد محفوظة على جهازك ومتزامنة مع السحابة عند اكتمال الإعداد.<br>ملخص يومي الساعة 8 صباحًا، وتنبيهات المهام حسب اختياراتك حتى لو التطبيق مغلق.</div>
 </div>
 
 
 <div class="modal" id="modal"><form class="sheet" id="taskForm">
 <div class="sheethead"><h3 id="formTitle">إضافة موعد</h3><button class="close" type="button" id="closeBtn">×</button></div>
 <label for="category">القسم</label><select class="field" id="category" required>
-<option value="patients">زيارة مرضى</option><option value="private">افتقاد شخصي</option><option value="weddings">أكاليل</option><option value="engagements">خطوبات</option><option value="special">مواعيد خاصة</option><option value="tash">صلاة الطشت</option><option value="houseBlessing">تبريك منازل</option>
+<option value="patients">زيارة مرضى</option><option value="private">زيارات خاصة</option><option value="weddings">أكاليل</option><option value="engagements">خطوبات</option><option value="special">مواعيد خاصة</option><option value="tash">صلاة الطشت</option><option value="houseBlessing">تبريك منازل</option>
 </select>
 <div id="dynamicFields"></div>
 <div class="row"><div><label for="date">التاريخ</label><input class="field" id="date" type="date" required></div><div><label for="time">الساعة</label><input class="field" id="time" type="time" required></div></div>
@@ -105,6 +106,7 @@ header{padding:27px 2px 22px;border-bottom:1px solid rgba(221,231,239,.8);margin
 <button class="save" type="submit">حفظ الموعد</button>
 </form></div>
 <div class="modal" id="massTimesModal" style="z-index:8"><div class="sheet"><div class="sheethead"><h3>مواعيد القداسات</h3><button class="close" type="button" id="closeMassTimes">×</button></div><div id="massTimesContent" style="text-align:center"><div class="empty"><strong>لم تتم إضافة صورة بعد</strong>اضغط على «إضافة صورة» لاختيار صورة مواعيد القداسات من جهازك.</div></div><input id="massTimesFile" type="file" accept="image/*" hidden><button class="save" type="button" id="uploadMassTimes">＋ إضافة صورة / تغيير الصورة</button><button class="tab" type="button" id="removeMassTimes" style="width:100%;margin-top:9px;color:#c43d58;display:none">حذف الصورة</button></div></div>
+<div class="modal" id="notesModal" style="z-index:9"><div class="sheet"><div class="sheethead"><h3>ملاحظات</h3><button class="close" type="button" id="closeNotes">×</button></div><label for="noteTitle">عنوان الملاحظة</label><input class="field" id="noteTitle" maxlength="120" placeholder="عنوان مختصر"><label for="noteText">الملاحظة</label><textarea class="field" id="noteText" rows="5" maxlength="3000" placeholder="اكتب ملاحظتك هنا..."></textarea><button class="save" type="button" id="saveNote">حفظ الملاحظة</button><div class="sectionhead"><h3>الملاحظات المسجلة</h3><span class="muted" id="notesCount"></span></div><div class="list" id="notesList"></div></div></div>
 <div class="toast" id="toast"></div>
 <script>
 const KEY='zakerni_tasks_v2', MORNING_KEY='zakerni_morning_v2';
@@ -140,7 +142,7 @@ function taskPlace(t){if(t.category==='patients')return t.place==='home'?'الب
 function taskDesc(t){let bits=[];let p=taskPlace(t);if(p)bits.push('المكان: '+p);if(t.category==='private'&&t.visitTypes?.length)bits.push('النوع: '+t.visitTypes.join('، '));if(t.notes)bits.push(t.notes);return bits.join(' • ')}
 function sorted(a){return [...a].sort((x,y)=>asDate(x)-asDate(y))}
 function render(){
- let now=new Date(), td=today(), active=tasks.filter(t=>!t.done);
+ let now=new Date(), td=today(), active=tasks.filter(t=>t.category!=='notes'&&!t.done);
  let todays=active.filter(t=>t.date===td);
  $('todayLabel').textContent=fmtDate(td);
  $('todayCount').textContent=todays.length;
@@ -148,7 +150,7 @@ function render(){
  $('doneCount').textContent=tasks.filter(t=>t.done).length;
  $('pendingCount').textContent=active.length;
  $('heroText').textContent=todays.length?`عندك ${todays.length} ${todays.length===1?'موعد مطلوب':'مواعيد مطلوبة'} النهارده. راجع القائمة تحت.`:'مفيش مواعيد مسجلة لليوم. تقدر تضيف موعد من الأقسام فوق.';
- let arr=sorted(tasks).filter(t=>{
+ let arr=sorted(tasks.filter(t=>t.category!=='notes')).filter(t=>{
    if(categoryView!=='all'&&t.category!==categoryView)return false;
    if(filter==='today')return t.date===td&&!t.done;
    if(filter==='upcoming')return !t.done&&asDate(t)>now;
@@ -252,7 +254,7 @@ function checkNotifications(){
  if(!('Notification'in window)||Notification.permission!=='granted')return;
  let now=new Date(); // ملخص اليوم يُرسل من Cloudflare Worker الساعة 8 صباحًا حتى لو التطبيق مغلق.
  tasks.forEach(t=>{
-  if(t.done||!t.notify)return;
+  if(t.category==='notes'||t.done||!t.notify)return;
   let due=asDate(t).getTime()-t.lead*60000, key=`${t.id}-${t.date}-${t.time}-${t.lead}`;
   if(due<=now.getTime()&&asDate(t).getTime()>now.getTime()-60000&&!notified.has(key)){
    sendNotice('ذكّرني: '+taskName(t),`${t.time} — ${taskDesc(t)||'ميعادك وصل'}`,'task-'+key);notified.add(key);
@@ -261,7 +263,7 @@ function checkNotifications(){
 }
 
 function renderToday(){
- const td=today(), now=new Date(); const arr=sorted(tasks.filter(t=>t.date===td));
+ const td=today(), now=new Date(); const arr=sorted(tasks.filter(t=>t.category!=='notes'&&t.date===td));
  $('todayListCount').textContent=arr.length+' موعد';
  const list=$('todayList');
  if(!arr.length){list.innerHTML='<div class="empty"><strong>مفيش مواعيد مسجلة لليوم 🎉</strong>افتح الأقسام لإضافة موعد جديد.</div>';return;}
@@ -274,6 +276,12 @@ $('todayList').onclick=e=>{let b=e.target.closest('[data-home-act]');if(!b)retur
 سيتم حذفه سواء كان مكتملًا أو لا.`)){(async()=>{if(await removeCloudTask(t.id)){tasks=tasks.filter(x=>String(x.id)!==String(t.id));localStorage.setItem(KEY,JSON.stringify(tasks));render();renderToday();toast('تم حذف الموعد نهائيًا من كل الأجهزة');}})()}}else{showManage();openForm(t.category,t)}};
 const originalRender=render;render=function(){originalRender();if($('todayList'))renderToday();};
 
+let editingNote=null;
+function renderNotes(){const notes=tasks.filter(t=>t.category==='notes').sort((a,b)=>(b.created||0)-(a.created||0));$('notesCount').textContent=notes.length+' ملاحظة';$('notesList').innerHTML=notes.length?notes.map(n=>`<article class="task"><div class="taskbody"><div class="tasktitle">${escapeHtml(n.name||'ملاحظة')}</div><div class="taskdesc" style="white-space:pre-wrap">${escapeHtml(n.notes||'')}</div></div><div class="actions"><button class="mini" data-note-edit="${n.id}" aria-label="تعديل">✎</button><button class="mini" data-note-delete="${n.id}" aria-label="حذف">⌫</button></div></article>`).join(''):'<div class="empty">لا توجد ملاحظات مسجلة حتى الآن.</div>';}
+function openNotes(){editingNote=null;$('noteTitle').value='';$('noteText').value='';renderNotes();$('notesModal').classList.add('show');}
+$('notesBtn').addEventListener('click',openNotes);$('closeNotes').onclick=()=>$('notesModal').classList.remove('show');$('notesModal').addEventListener('click',e=>{if(e.target===$('notesModal'))$('notesModal').classList.remove('show')});
+$('saveNote').onclick=()=>{const name=$('noteTitle').value.trim(),notes=$('noteText').value.trim();if(!name&&!notes){toast('اكتب عنوان الملاحظة أو محتواها');return;}const old=editingNote?tasks.find(t=>t.id===editingNote):null;const note={id:editingNote||crypto.randomUUID(),category:'notes',name:name||'ملاحظة',notes,date:today(),time:'00:00',lead:0,repeat:'none',alertRepeatMinutes:0,notify:false,done:false,created:old?.created||Date.now()};if(editingNote)tasks=tasks.map(t=>t.id===editingNote?note:t);else tasks.push(note);persist();editingNote=null;$('noteTitle').value='';$('noteText').value='';renderNotes();toast('تم حفظ الملاحظة ✓');};
+$('notesList').onclick=async e=>{const edit=e.target.closest('[data-note-edit]'),del=e.target.closest('[data-note-delete]');if(edit){const n=tasks.find(t=>t.id===edit.dataset.noteEdit);if(!n)return;editingNote=n.id;$('noteTitle').value=n.name||'';$('noteText').value=n.notes||'';$('noteTitle').focus();}else if(del){const id=del.dataset.noteDelete;if(!confirm('حذف الملاحظة؟'))return;if(await removeCloudTask(id)){tasks=tasks.filter(t=>String(t.id)!==String(id));localStorage.setItem(KEY,JSON.stringify(tasks));renderNotes();toast('تم حذف الملاحظة');}}};
 if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 render();renderToday();showHome();checkNotifications();checkDatabaseConnection();syncCloud();setInterval(()=>{checkNotifications();render();renderToday()},15000);
 </script>
